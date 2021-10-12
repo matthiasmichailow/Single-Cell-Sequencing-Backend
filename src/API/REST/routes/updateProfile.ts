@@ -11,13 +11,13 @@ export default function update_profile_route() {
         .post("/update_profile")
         .use(verify_authenticated_user())
         .use(async (req: ExtRequest, res) => {
-            const {firstName, lastName, email, password} = req.body;
-            if (!await userModel.findOne({email})) {
+            const {firstName, lastName, email, password, old_email} = req.body;
+            if (!await userModel.findOne({old_email})) {
                 return res.status(409).send("User with the given email does not exists");
             }
             const encryptedPassword = await bcrypt.hash(password, 15);
-            await userModel.updateOne({email}, {
-                firstName, lastName, password: encryptedPassword
+            await userModel.updateOne({old_email}, {
+                email, firstName, lastName, password: encryptedPassword
             });
             console.log(`${req.user_id} has updated their profile`);
             res.send("Your profile has been updated")
