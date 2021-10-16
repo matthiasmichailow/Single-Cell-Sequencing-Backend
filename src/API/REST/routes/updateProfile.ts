@@ -15,6 +15,9 @@ export default function update_profile_route() {
             if (!await userModel.findOne({old_email})) {
                 return res.status(409).send("User with the given email does not exists");
             }
+            if (await userModel.findOne({email})) {
+                return res.status(409).send("There is already another user with the given email!")
+            }
             const encryptedPassword = await bcrypt.hash(password, 15);
             await userModel.updateOne({old_email}, {
                 email, firstName, lastName, password: encryptedPassword
